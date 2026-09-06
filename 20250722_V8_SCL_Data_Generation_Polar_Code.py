@@ -187,6 +187,10 @@ def adaptive_polar_tomo(idx):
     prob_x = []
     prob_y = []
     prob_z = []
+    # keep last valid estimate to reuse after an unreliable block
+    last_valid_prob_x = [0.9, 0.1]
+    last_valid_prob_y = [0.9, 0.1]
+    last_valid_prob_z = [0.9, 0.1]
     
     reliability_idx_x = 0
     reliability_idx_y = 0
@@ -228,7 +232,7 @@ def adaptive_polar_tomo(idx):
         
         # capacity x, reliability x
         capacity_x = bsc_cap(prob_x[0])        
-        if capacity_x < k_curr_x/(2**n) or np.isnan(prob_x[0]): #unreliable
+        if np.isnan(prob_x[0]): #unreliable
             reliability_x = 0
             reliability_idx_x = 0
             cap_x.append(np.nan)
@@ -262,6 +266,10 @@ def adaptive_polar_tomo(idx):
         cap_act_x.append(bsc_cap(ch_varying_x[2**(n - 1)][0]))
         perc_x_v.append((k_curr_x/((2**n)*cap_act_x[-1])))
         k_curr_x = max(1, int(np.floor(perc_x*2**n*cap_ref))) # setting at percent
+        if np.isnan(prob_x[0]): # unreliable, use last valid estimate
+            prob_x = last_valid_prob_x
+        else:
+            last_valid_prob_x = prob_x
         
         
         
@@ -269,7 +277,7 @@ def adaptive_polar_tomo(idx):
         
         # capacity y, reliability y
         capacity_y = bsc_cap(prob_y[0])        
-        if capacity_y < k_curr_y/(2**n) or np.isnan(prob_y[0]): #unreliable
+        if np.isnan(prob_y[0]): #unreliable
             reliability_y = 0
             reliability_idx_y = 0
             cap_y.append(np.nan)
@@ -303,11 +311,15 @@ def adaptive_polar_tomo(idx):
         cap_act_y.append(bsc_cap(ch_varying_y[2**(n - 1)][0]))
         perc_y_v.append((k_curr_y/((2**n)*cap_act_y[-1])))
         k_curr_y = max(1, int(np.floor(perc_y*2**n*cap_ref))) # setting at percent
+        if np.isnan(prob_y[0]): # unreliable, use last valid estimate
+            prob_y = last_valid_prob_y
+        else:
+            last_valid_prob_y = prob_y
         
         
         # capacity z, reliability z
         capacity_z = bsc_cap(prob_z[0])        
-        if capacity_z < k_curr_z/(2**n) or np.isnan(prob_z[0]): #unreliable
+        if np.isnan(prob_z[0]): #unreliable
             reliability_z = 0
             reliability_idx_z = 0
             cap_z.append(np.nan)
@@ -341,6 +353,10 @@ def adaptive_polar_tomo(idx):
         cap_act_z.append(bsc_cap(ch_varying_z[2**(n - 1)][0]))
         perc_z_v.append((k_curr_z/((2**n)*cap_act_z[-1])))
         k_curr_z = max(1, int(np.floor(perc_z*2**n*cap_ref))) # setting at percent
+        if np.isnan(prob_z[0]): # unreliable, use last valid estimate
+            prob_z = last_valid_prob_z
+        else:
+            last_valid_prob_z = prob_z
                 
                 
                 

@@ -81,7 +81,7 @@ def main():
                 results.append(result)
         #ber, ber_un, ber_re = bsc_polar16(kk, n, p, verbose=False)
         #print(results)
-        if np.isnan(results).sum() > 0 or np.nansum(results) > 0.01: # unreliable, decrease code rate
+        if np.isnan(results).sum() > 0: # unreliable, decrease code rate
             reliability_idx = 0 # forcing to wait before trying to increase again
             kk -= 1
             print("*************************")

@@ -111,19 +111,20 @@ def run_simulation_for_sample(args):
             x_direct = np.linalg.matmul(A, b_direct)
             DN_row[i] = np.sum(np.abs(pauli_P - x_direct))
 
-            kk_X = int(np.round(x_targ * cap_x * (2**n)))
+            if n == 8:  # lower targets for n=8
+                x_t, y_t, z_t = 0.535, 0.36, 0.34
+            else:
+                x_t, y_t, z_t = x_targ, y_targ, z_targ
+            kk_X = int(np.round(x_t * cap_x * (2**n)))
             ber_X, X_est_polar, _ = polar_code_fix(kk_X, n, X_channel[1])
-            kk_Y = int(np.round(y_targ * cap_y * (2**n)))
+            kk_Y = int(np.round(y_t * cap_y * (2**n)))
             ber_Y, Y_est_polar, _ = polar_code_fix(kk_Y, n, Y_channel[1])
-            kk_Z = int(np.round(z_targ * cap_z * (2**n)))
+            kk_Z = int(np.round(z_t * cap_z * (2**n)))
             ber_Z, Z_est_polar, _ = polar_code_fix(kk_Z, n, Z_channel[1])
 
             b_polar = np.array([X_est_polar[0], Y_est_polar[0], Z_est_polar[0], 1])
             x_polar = np.linalg.matmul(A, b_polar)
-            if ber_X < 0.01 and ber_Y < 0.01 and ber_Z < 0.01:
-                DN_polar_row[i] = np.sum(np.abs(pauli_P - x_polar))
-            else:
-                DN_polar_row[i] = np.nan
+            DN_polar_row[i] = np.sum(np.abs(pauli_P - x_polar))
         except:
             DN_row[i] = np.nan
             DN_polar_row[i] = np.nan
@@ -158,8 +159,8 @@ if __name__ == '__main__':
 
 
     
-    DN_distance_avg = np.log2(np.nanmean(DN_distance, axis=1))
-    DN_distance_polar_avg = np.log2(np.nanmean(DN_distance_polar, axis=1))
+    DN_distance_avg = np.log2(np.mean(DN_distance, axis=1))
+    DN_distance_polar_avg = np.log2(np.mean(DN_distance_polar, axis=1))
     ch_uses = np.log2(3 * 2**np.array(N))
 
 

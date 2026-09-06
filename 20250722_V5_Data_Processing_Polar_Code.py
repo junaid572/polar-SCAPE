@@ -13,6 +13,7 @@ Created on Sun May 21 22:34:53 2023
 @author: junaidrehman
 """
 
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -54,37 +55,27 @@ for idx in range(1000):
     perc_ach.append(data2[:, 14:17])
     
     #print(idx)
-######### Cleaning rates ############
-# setting rate = 0 where NaN occured
-cap_estimates = np.array(cap_estimates)
-rates_effective = np.array(rates)
 
-# Step 1: Copy NaNs from cap_estimates to rates
-rates_effective[np.isnan(cap_estimates)] = np.nan
+# setting rate = 0 for unreliable (NaN) blocks
+rates = np.array(rates)
+rates[np.isnan(np.array(cap_estimates))] = 0.0
 
-# Step 2: Set NaNs in rates to zero
-rates_effective[np.isnan(rates)] = 0.0
+mean_DN_distance = np.mean(DN_distance, axis = 0)
+std_DN = 0.5*np.std(DN_distance, axis = 0)
 
-# rates = rates_effective
-#######################################
+mean_ch_estimates = np.mean(ch_estimates, axis = 0)
+std_ch_estimates = 0.5*np.std(ch_estimates, axis = 0)
 
-
-mean_DN_distance = np.nanmean(DN_distance, axis = 0)
-std_DN = 0.5*np.nanstd(DN_distance, axis = 0)
-
-mean_ch_estimates = np.nanmean(ch_estimates, axis = 0)
-std_ch_estimates = 0.5*np.nanstd(ch_estimates, axis = 0)
-
-mean_rates = np.nanmean(rates, axis = 0)
-min_rates = np.nanmin(rates, axis = 0)
-max_rates = np.nanmax(rates, axis = 0)
-std_rates = 0.5*np.nanstd(rates, axis = 0)
+mean_rates = np.mean(rates, axis = 0)
+min_rates = np.min(rates, axis = 0)
+max_rates = np.max(rates, axis = 0)
+std_rates = 0.5*np.std(rates, axis = 0)
 
 mean_cap_estimates = np.nanmean(cap_estimates, axis = 0)
 std_cap_estimates = 0.5*np.nanstd(cap_estimates, axis = 0)
 
-mean_perc_estimates = np.nanmean(perc_ach, axis = 0)
-std_perc_estimates = 0.5*np.nanstd(perc_ach, axis = 0)
+mean_perc_estimates = np.mean(perc_ach, axis = 0)
+std_perc_estimates = 0.5*np.std(perc_ach, axis = 0)
 
 #%% plotting starts here
 
@@ -204,6 +195,7 @@ if write_file:
     header3 = "X" + "".join([f"\tY{i}" for i in range(1, num_columns)])
     
         
+    os.makedirs('Data_Processed_20250722', exist_ok = True)
     np.savetxt('Data_Processed_20250722/polar8-5_SCL_A_.dat', data1_export, delimiter = '\t', header = header1, comments = "")
     np.savetxt('Data_Processed_20250722/polar8-5_SCL_B_.dat', data2_export, delimiter = '\t', header = header2, comments = "")
     np.savetxt('Data_Processed_20250722/polar8-5_SCL_C_.dat', data3_export, delimiter = '\t', header = header3, comments = "")
